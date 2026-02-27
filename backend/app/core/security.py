@@ -1,7 +1,7 @@
 import bcrypt
 import jwt
 from datetime import datetime, timedelta
-from app.config import JWT_SECRET, JWT_ALGORITHM
+from app.config import JWT_SECRET, JWT_ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
 
 
 # 🔐 Hash password
@@ -16,10 +16,13 @@ def verify_password(password: str, hashed: str) -> bool:
 
 # 🔐 Create JWT token
 def create_access_token(user_id: int, role: str):
+    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+
     payload = {
-        "user_id": user_id,
+        "sub": str(user_id),
         "role": role,
-        "exp": datetime.utcnow() + timedelta(hours=12)
+        "exp": expire
     }
+    print("ENCODE SECRET:", JWT_SECRET)
     token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
     return token
