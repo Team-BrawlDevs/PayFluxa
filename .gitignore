@@ -1,0 +1,28 @@
+# =====================
+# BACKEND
+# =====================
+
+backend/venv/
+backend/.env
+backend/__pycache__/
+backend/*.pyc
+
+# =====================
+# FRONTEND
+# =====================
+
+PayFluxa-frontend/node_modules/
+PayFluxa-frontend/dist/
+PayFluxa-frontend/.env
+PayFluxa-frontend/.env.local
+
+# Logs
+*.log
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
