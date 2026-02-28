@@ -5,8 +5,14 @@ from app.db import models
 from app.api import auth_routes
 from app.core.rbac import require_role
 from app.core.audit import log_action
-app = FastAPI()
+from app.api.routes import account_routes
+from app.api.routes import transaction_routes
 
+
+
+app = FastAPI()
+app.include_router(account_routes.router, prefix="/account", tags=["Account"])
+app.include_router(transaction_routes.router, prefix="/transaction", tags=["Transaction"])
 # Security scheme for Swagger
 security = HTTPBearer()
 

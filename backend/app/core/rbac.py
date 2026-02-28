@@ -1,4 +1,5 @@
-from fastapi import Depends, HTTPException, Header
+from fastapi import Depends, HTTPException, status
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 import jwt
 from jwt import ExpiredSignatureError, InvalidTokenError
@@ -8,6 +9,11 @@ from app.db.database import SessionLocal
 from app.db.models import User
 
 
+# 🔐 Swagger-compatible security scheme
+security = HTTPBearer()
+
+
+# 📦 DB Dependency
 def get_db():
     db = SessionLocal()
     try:
@@ -16,48 +22,63 @@ def get_db():
         db.close()
 
 
+# 👤 Get current logged-in user from token
 def get_current_user(
-    authorization: str = Header(...),
+    credentials: HTTPAuthorizationCredentials = Depends(security),
     db: Session = Depends(get_db)
 ):
-    print("DECODE SECRET:", JWT_SECRET)
-    print("AUTH HEADER RECEIVED:", authorization)
-    if not authorization.startswith("Bearer "):
-        raise HTTPException(status_code=401, detail="Invalid authorization header")
-
-    token = authorization.split(" ")[1]
+    token = credentials.credentials
 
     try:
         payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
-        user_id = int(payload.get("sub"))
+        user_id = payload.get("sub")
 
         if user_id is None:
-            raise HTTPException(status_code=401, detail="Invalid token payload")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid token payload"
+            )
 
     except ExpiredSignatureError:
-        raise HTTPException(status_code=401, detail="Token expired")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token expired"
+        )
 
     except InvalidTokenError:
-        raise HTTPException(status_code=401, detail="Invalid token")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token"
+        )
 
-    # 🔎 Verify user exists
+    # 🔎 Fetch user from DB
     user = db.query(User).filter(User.id == user_id).first()
 
     if not user:
-        raise HTTPException(status_code=401, detail="User not found")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not found"
+        )
 
     if not user.is_active:
-        raise HTTPException(status_code=403, detail="Inactive user")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Inactive user"
+        )
 
-    return {
-        "user_id": user.id,
-        "role": user.role
-    }
+    return user
 
 
+# 🛡 Role-based access control
 def require_role(required_role: str):
-    def role_checker(user=Depends(get_current_user)):
-        if user["role"] != required_role:
-            raise HTTPException(status_code=403, detail="Forbidden: insufficient role")
-        return user
+    def role_checker(current_user: User = Depends(get_current_user)):
+
+        if current_user.role != required_role:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Forbidden: insufficient role"
+            )
+
+        return current_user
+
     return role_checker

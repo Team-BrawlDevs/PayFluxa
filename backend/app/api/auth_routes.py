@@ -3,6 +3,8 @@ from sqlalchemy.orm import Session
 from app.db.database import SessionLocal
 from app.db.models import User
 from app.core.security import hash_password, verify_password, create_access_token
+from app.services.account_service import create_account_for_user
+from app.services.audit_service import create_audit_log
 
 router = APIRouter()
 
@@ -36,8 +38,21 @@ def register(email: str, password: str, role: str, db: Session = Depends(get_db)
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
+    # 🏦 Create bank account automatically
+    account = create_account_for_user(db, new_user.id)
 
-    return {"message": "User registered successfully"}
+    # 🧾 Audit log
+    create_audit_log(
+        db=db,
+        user_id=new_user.id,
+        action="ACCOUNT_CREATED",
+        details=f"Account {account.account_number} created"
+    )
+
+    return {
+        "message": "User registered successfully",
+        "account_number": account.account_number
+    }
 
 
 # ✅ Login User
