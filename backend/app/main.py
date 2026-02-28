@@ -7,7 +7,7 @@ from app.core.rbac import require_role
 from app.core.audit import log_action
 from app.api.routes import account_routes
 from app.api.routes import transaction_routes
-
+from app.api.routes import analytics_routes
 
 
 app = FastAPI()
@@ -43,3 +43,5 @@ def protected_customer(user=Depends(require_role("customer"))):
     print("LOG FUNCTION CALLED")
 
     return {"message": "Customer access granted"}
+
+app.include_router(analytics_routes.router)
