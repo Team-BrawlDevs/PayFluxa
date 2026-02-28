@@ -8,7 +8,7 @@ from app.core.audit import log_action
 from app.api.routes import account_routes
 from app.api.routes import transaction_routes
 from app.api.routes import analytics_routes
-
+from app.api.routes import admin_routes
 
 app = FastAPI()
 app.include_router(account_routes.router, prefix="/account", tags=["Account"])
@@ -45,3 +45,4 @@ def protected_customer(user=Depends(require_role("customer"))):
     return {"message": "Customer access granted"}
 
 app.include_router(analytics_routes.router)
+app.include_router(admin_routes.router)

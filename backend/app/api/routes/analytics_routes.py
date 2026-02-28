@@ -8,6 +8,8 @@ from app.services.insight_service import generate_insights
 from app.services.simulation_service import simulate_scenario
 from fastapi import Body
 from app.services.monte_carlo_service import monte_carlo_forecast
+from app.services.copilot_service import generate_financial_advice
+from app.services.fraud_service import detect_fraud
 
 router = APIRouter(prefix="/analytics", tags=["Analytics"])
 
@@ -75,3 +77,17 @@ def run_monte_carlo(
         emi=emi,
         simulations=simulations
     )
+
+@router.get("/copilot")
+def run_copilot(
+    db: Session = Depends(get_db),
+    user = Depends(get_current_user)
+):
+    return generate_financial_advice(db, user.id)
+
+@router.get("/fraud-check")
+def run_fraud_detection(
+    db: Session = Depends(get_db),
+    user = Depends(get_current_user)
+):
+    return detect_fraud(db, user.id)
