@@ -7,6 +7,7 @@ from app.services.risk_service import calculate_risk_profile
 from app.services.insight_service import generate_insights
 from app.services.simulation_service import simulate_scenario
 from fastapi import Body
+from app.services.monte_carlo_service import monte_carlo_forecast
 
 router = APIRouter(prefix="/analytics", tags=["Analytics"])
 
@@ -55,4 +56,22 @@ def simulate_financial_scenario(
         monthly_expenses=monthly_expenses,
         emi=emi,
         one_time_withdrawal=one_time_withdrawal
+    )
+
+@router.post("/monte-carlo")
+def run_monte_carlo(
+    db: Session = Depends(get_db),
+    user = Depends(get_current_user),
+    monthly_income: float = Body(...),
+    monthly_expenses: float = Body(...),
+    emi: float = Body(...),
+    simulations: int = Body(1000)
+):
+    return monte_carlo_forecast(
+        db=db,
+        user_id=user.id,
+        monthly_income=monthly_income,
+        monthly_expenses=monthly_expenses,
+        emi=emi,
+        simulations=simulations
     )
