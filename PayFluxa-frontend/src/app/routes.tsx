@@ -13,6 +13,8 @@ import { BorrowerRisk } from "./pages/bank/BorrowerRisk";
 import { Restructuring } from "./pages/bank/Restructuring";
 import { PolicySimulation } from "./pages/bank/PolicySimulation";
 import { AuditLogs } from "./pages/bank/AuditLogs";
+import { ProtectedRoute } from "./components/ProtectedRoute";
+import { Login } from "./pages/Login";
 
 export const router = createBrowserRouter([
   {
@@ -20,8 +22,16 @@ export const router = createBrowserRouter([
     element: <Welcome />,
   },
   {
+    path: "/login",
+    element: <Login />,
+  },
+  {
     path: "/customer",
-    element: <CustomerLayout />,
+    element: (
+      <ProtectedRoute requiredRole="customer">
+        <CustomerLayout />
+      </ProtectedRoute>
+    ),
     children: [
       { index: true, element: <Navigate to="/customer/dashboard" replace /> },
       { path: "dashboard", element: <CustomerDashboard /> },
@@ -34,7 +44,11 @@ export const router = createBrowserRouter([
   },
   {
     path: "/bank",
-    element: <BankLayout />,
+    element: (
+      <ProtectedRoute requiredRole="admin">
+        <BankLayout />
+      </ProtectedRoute>
+    ),
     children: [
       { index: true, element: <Navigate to="/bank/portfolio" replace /> },
       { path: "portfolio", element: <PortfolioDashboard /> },
