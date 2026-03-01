@@ -121,3 +121,18 @@ def monthly_income_summary(
     user = Depends(get_current_user)
 ):
     return get_monthly_income_summary(db, user.id)
+
+@router.get("/admin/analytics/borrower/{user_id}")
+def get_borrower_profile(user_id: int, db: Session = Depends(get_db)):
+
+    health = calculate_health_score(db, user_id)
+    risk = calculate_risk_profile(db, user_id)
+
+    return {
+        "health_score": health["health_score"],
+        "risk_level": risk["risk_level"],
+        "risk_score": risk["risk_score"],
+        "financials": health.get("financials", {}),
+        "trend": health.get("historical_trend", []),
+        "stress_probability_percentage": risk.get("stress_probability_percentage", 0)
+    }
