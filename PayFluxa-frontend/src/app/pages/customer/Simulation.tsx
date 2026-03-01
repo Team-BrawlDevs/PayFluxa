@@ -141,10 +141,10 @@ export function Simulation() {
                 value={result.current_state.buffer_months}
                 suffix=" months"
               />
-              <Metric
+              {/* <Metric
                 label="EMI Burden"
                 value={result.current_state.emi_burden_percent}
-              />
+              /> */}
               <Metric
                 label="Resilience Score"
                 value={result.current_state.resilience_score}
@@ -166,10 +166,10 @@ export function Simulation() {
                 delta={result.impact_metrics.buffer_change}
                 suffix=" months"
               />
-              <Metric
+              {/* <Metric
                 label="EMI Burden"
                 value={result.projected_state.emi_burden_percent}
-              />
+              /> */}
               <Metric
                 label="Resilience Score"
                 value={result.projected_state.resilience_score}
