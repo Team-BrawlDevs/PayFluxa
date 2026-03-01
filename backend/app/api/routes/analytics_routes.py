@@ -94,12 +94,19 @@ def get_monte_carlo_summary(
         simulations=1000
     )
     
-@router.get("/copilot")
+from pydantic import BaseModel
+
+class CopilotRequest(BaseModel):
+    question: str
+
+
+@router.post("/copilot")
 def run_copilot(
+    request: CopilotRequest,
     db: Session = Depends(get_db),
     user = Depends(get_current_user)
 ):
-    return generate_financial_advice(db, user.id)
+    return generate_financial_advice(db, user.id, request.question)
 
 @router.get("/fraud-check")
 def run_fraud_detection(

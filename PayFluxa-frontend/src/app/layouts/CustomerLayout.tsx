@@ -16,6 +16,7 @@ import {
 } from "../services/authService";
 import { useNavigate } from "react-router";
 import { useState, useEffect } from "react";
+import { useSessionTimer, formatTime } from "../hooks/useSessionTimer";
 
 const menuItems = [
   { path: "/customer/dashboard", icon: LayoutDashboard, label: "Dashboard" },
@@ -34,6 +35,7 @@ export function CustomerLayout() {
   const navigate = useNavigate();
   const [user, setUser] = useState<any>(null);
   const [account, setAccount] = useState<any>(null);
+  const timeLeft = useSessionTimer();
   useEffect(() => {
     const loadUser = async () => {
       try {
@@ -56,6 +58,7 @@ export function CustomerLayout() {
   return (
     <div className="flex h-screen bg-background">
       {/* Sidebar */}
+
       <aside className="w-64 bg-white border-r border-border flex flex-col">
         <div className="p-6 border-b border-border">
           <h1 className="text-xl text-primary">PayFluxa</h1>
@@ -91,6 +94,7 @@ export function CustomerLayout() {
             <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm">
               AK
             </div>
+
             <div className="flex-1">
               <div className="text-sm font-medium">
                 CIF: {account?.account_number}
@@ -113,9 +117,15 @@ export function CustomerLayout() {
             <span className="text-foreground">Dashboard</span>
           </div>
           <div className="flex items-center gap-4">
+            <div className="text-xs text-muted-foreground mt-2">
+              Session expires in: {formatTime(timeLeft)}
+            </div>
             <button className="relative p-2 hover:bg-secondary rounded">
               <Bell size={20} />
               <span className="absolute top-1 right-1 w-2 h-2 bg-[#DC2626] rounded-full"></span>
+            </button>
+            <button onClick={handleLogout} className="text-sm text-red-500">
+              Logout
             </button>
           </div>
         </header>
@@ -124,9 +134,6 @@ export function CustomerLayout() {
         <main className="flex-1 overflow-auto p-8">
           <Outlet />
         </main>
-        <button onClick={handleLogout} className="text-sm text-red-500">
-          Logout
-        </button>
       </div>
     </div>
   );
