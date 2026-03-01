@@ -76,7 +76,6 @@ def approve_restructure(
             action_type="LOAN_RESTRUCTURE_APPROVED",
             entity_type="loan",
             entity_id=loan.id,
-            timestamp=datetime.utcnow(),
             details=f"Approved restructuring case {case.case_id}"
         )
 
@@ -95,7 +94,7 @@ def reject_restructure(
     case_id: str,
     comments: str = "",
     db: Session = Depends(get_db),
-    admin = Depends(require_role("admin"))
+    admin=Depends(require_role("admin"))
 ):
     case = db.query(LoanRestructuringCase).filter(
         LoanRestructuringCase.case_id == case_id
@@ -119,12 +118,12 @@ def reject_restructure(
             action_type="LOAN_RESTRUCTURE_REJECTED",
             entity_type="loan",
             entity_id=case.loan_id,
-            timestamp=datetime.utcnow(),
             details=f"Rejected restructuring case {case.case_id}"
         )
 
         db.add(audit)
 
+        db.flush()  # ensure insert runs
         db.commit()
 
     except Exception as e:
