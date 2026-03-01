@@ -98,6 +98,7 @@ def get_monthly_income_summary(db: Session, user_id: int):
     )
 
     # ---- Latest Transactions (Last 10) ----
+        # ---- Latest Transactions (Last 10) ----
     latest_transactions = db.query(Transaction).filter(
         Transaction.status == "SUCCESS",
         (
@@ -108,25 +109,30 @@ def get_monthly_income_summary(db: Session, user_id: int):
 
     formatted_transactions = []
 
+    # Start from current total balance
+    running_balance = Decimal(total_balance)
+
     for txn in latest_transactions:
 
         if txn.transaction_type == "DEPOSIT":
             txn_type = "Credit"
-            amount = float(txn.amount)
+            amount = Decimal(txn.amount)
+            running_balance -= amount  # reverse effect
 
         elif txn.transaction_type == "WITHDRAW":
             txn_type = "Debit"
-            amount = -float(txn.amount)
+            amount = Decimal(txn.amount)
+            running_balance += amount  # reverse effect
 
         else:
-            continue  # ignore transfers
+            continue
 
         formatted_transactions.append({
             "date": txn.created_at.strftime("%d %b %Y"),
             "type": txn_type,
             "category": txn.transaction_type,
-            "amount": amount,
-            "balance": float(total_balance)  # or compute running balance if needed
+            "amount": float(amount if txn_type == "Credit" else -amount),
+            "balance": float(running_balance)
         })
 
     return {
