@@ -1,6 +1,6 @@
 import api from "./api";
 
-export const getHealth = async () => {
+export const getHealthScore = async () => {
   const res = await api.get("/analytics/health-score");
   return res.data;
 };
