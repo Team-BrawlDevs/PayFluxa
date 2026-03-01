@@ -17,6 +17,7 @@ import {
   ZAxis,
 } from "recharts";
 import { TrendingUp, Users, AlertTriangle } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 /* ================= TYPES ================= */
 
@@ -35,6 +36,7 @@ interface PortfolioResponse {
 
 export function PortfolioDashboard() {
   const [data, setData] = useState<PortfolioResponse | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -100,7 +102,10 @@ export function PortfolioDashboard() {
         />
 
         <KPICard title="High Risk Borrowers">
-          <div className="flex items-center gap-3">
+          <div
+            className="flex items-center gap-3 cursor-pointer"
+            onClick={() => navigate("/bank/borrower-risk")}
+          >
             <AlertTriangle size={32} className="text-[#DC2626]" />
             <div>
               <div className="text-2xl">{data.high_risk_users.length}</div>
