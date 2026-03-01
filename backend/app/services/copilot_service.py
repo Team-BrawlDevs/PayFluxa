@@ -3,7 +3,7 @@ from pathlib import Path
 import os
 import json
 import re
-from google import genai
+import google.generativeai as genai
 from sqlalchemy.orm import Session
 from app.services.health_service import calculate_health_score
 from app.services.risk_service import calculate_risk_profile
@@ -20,7 +20,8 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 if not GEMINI_API_KEY:
     raise ValueError("GEMINI_API_KEY not found in .env")
 
-client = genai.Client(api_key=GEMINI_API_KEY)
+genai.configure(api_key=GEMINI_API_KEY)
+
 
 
 def generate_financial_advice(db: Session, user_id: int, question: str):
@@ -71,10 +72,9 @@ Return EXACTLY this structure:
 }}
 """
 
-    response = client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=prompt,
-    )
+    model = genai.GenerativeModel("gemini-2.5-flash")
+
+    response = model.generate_content(prompt)
 
     raw_text = response.text
 

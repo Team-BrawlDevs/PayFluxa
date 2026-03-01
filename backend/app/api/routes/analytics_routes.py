@@ -10,6 +10,7 @@ from fastapi import Body
 from app.services.monte_carlo_service import monte_carlo_forecast
 from app.services.copilot_service import generate_financial_advice
 from app.services.fraud_service import detect_fraud
+from app.services.financial_twin_service import get_monthly_income_summary
 
 router = APIRouter(prefix="/analytics", tags=["Analytics"])
 
@@ -114,3 +115,9 @@ def run_fraud_detection(
     user = Depends(get_current_user)
 ):
     return detect_fraud(db, user.id)
+@router.get("/financial-twin/monthly-summary")
+def monthly_income_summary(
+    db: Session = Depends(get_db),
+    user = Depends(get_current_user)
+):
+    return get_monthly_income_summary(db, user.id)
