@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from app.db.models import Account, Transaction
+from app.db.models import Account, Transaction, Loan
 from decimal import Decimal, ROUND_HALF_UP
 from fastapi import HTTPException
 from sqlalchemy import func
@@ -107,8 +107,29 @@ def calculate_health_score(db: Session, user_id: int):
     else:
         liquidity_score = 15
 
-    # ---- 9. Component 5: Debt Placeholder (Max 15) ----
-    debt_score = 15  # Until loan engine integrates
+    # ---- 9. Component 5: Loan-Aware Debt Score (Max 15) ----
+
+    active_loans = db.query(Loan).filter(
+        Loan.user_id == user_id,
+        Loan.status == "ACTIVE"
+    ).all()
+
+    total_emi = sum([Decimal(loan.emi_amount) for loan in active_loans])
+
+    if avg_monthly_income > 0:
+        emi_ratio = total_emi / avg_monthly_income
+    else:
+        emi_ratio = Decimal(1)
+
+    # Lower EMI burden = higher debt score
+    if emi_ratio < Decimal("0.2"):
+        debt_score = 15
+    elif emi_ratio < Decimal("0.35"):
+        debt_score = 10
+    elif emi_ratio < Decimal("0.5"):
+        debt_score = 6
+    else:
+        debt_score = 2
 
     # ---- 10. Final Score Normalized ----
     final_score = (

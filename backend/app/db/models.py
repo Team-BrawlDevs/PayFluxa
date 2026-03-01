@@ -89,3 +89,28 @@ class AuditLog(Base):
     entity_id = Column(Integer, nullable=True)
     timestamp = Column(DateTime(timezone=True), server_default=func.now())
     details = Column(String)
+from sqlalchemy import Column, Integer, Numeric, ForeignKey, String, DateTime
+from datetime import datetime
+
+
+class Loan(Base):
+    __tablename__ = "loans"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+
+    principal_amount = Column(Numeric(15, 2), nullable=False)
+    interest_rate = Column(Numeric(5, 2), nullable=False)  # Annual %
+
+    tenure_months = Column(Integer, nullable=False)
+
+    emi_amount = Column(Numeric(15, 2), nullable=False)
+
+    outstanding_balance = Column(Numeric(15, 2), nullable=False)
+
+    start_date = Column(DateTime, default=datetime.utcnow)
+
+    status = Column(String(20), default="ACTIVE")
+
+    created_at = Column(DateTime, default=datetime.utcnow)

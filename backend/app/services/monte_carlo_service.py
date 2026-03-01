@@ -17,7 +17,20 @@ def monte_carlo_forecast(
 
     monthly_income = Decimal(monthly_income)
     monthly_expenses = Decimal(monthly_expenses)
-    emi = Decimal(emi)
+
+    # ---- EMI Logic (Flexible Mode) ----
+    emi = Decimal(emi) if emi else Decimal(0)
+
+    if emi <= 0:
+        # Fetch Active Loan EMI from DB
+        from app.db.models import Loan
+
+        active_loans = db.query(Loan).filter(
+            Loan.user_id == user_id,
+            Loan.status == "ACTIVE"
+        ).all()
+
+        emi = sum([Decimal(loan.emi_amount) for loan in active_loans])
 
     # ---- Fetch Starting Balance ----
     accounts = db.query(Account).filter(Account.user_id == user_id).all()

@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from app.services.health_service import calculate_health_score
-from app.db.models import Transaction, Account
+from app.db.models import Transaction, Account, Loan
 from datetime import datetime, timedelta
 from decimal import Decimal
 
@@ -48,13 +48,29 @@ def calculate_risk_profile(db: Session, user_id: int):
 
     pressure_risk = min(float(pressure_ratio * 30), 30)
 
+    # ---- 4. EMI Burden Risk (Loan-Aware) ----
+    active_loans = db.query(Loan).filter(
+        Loan.user_id == user_id,
+        Loan.status == "ACTIVE"
+    ).all()
+
+    total_emi = sum([Decimal(loan.emi_amount) for loan in active_loans])
+
+    if total_balance > 0:
+        emi_pressure_ratio = total_emi / total_balance
+    else:
+        emi_pressure_ratio = Decimal(1)
+
+    emi_risk = min(float(emi_pressure_ratio * 25), 25)
+
     # ---- Final Risk Score ----
     risk_score = round(
-        health_risk * 0.5 +
-        failure_risk +
-        pressure_risk,
-        2
-    )
+    health_risk * 0.5 +
+    failure_risk +
+    pressure_risk +
+    emi_risk,
+    2
+)
 
     # ---- Risk Classification ----
     if risk_score < 25:
