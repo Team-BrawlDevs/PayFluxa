@@ -132,3 +132,29 @@ def reject_restructure(
         raise HTTPException(status_code=500, detail=str(e))
 
     return {"message": "Restructuring rejected successfully"}
+
+@router.get("/restructuring/cases")
+def list_restructuring_cases(
+    db: Session = Depends(get_db),
+    admin=Depends(require_role("admin"))
+):
+    cases = db.query(LoanRestructuringCase)\
+        .order_by(LoanRestructuringCase.generated_at.desc())\
+        .all()
+
+    return cases
+
+@router.get("/restructuring/{case_id}")
+def get_restructuring_case(
+    case_id: str,
+    db: Session = Depends(get_db),
+    admin=Depends(require_role("admin"))
+):
+    case = db.query(LoanRestructuringCase)\
+        .filter(LoanRestructuringCase.case_id == case_id)\
+        .first()
+
+    if not case:
+        raise HTTPException(status_code=404, detail="Case not found")
+
+    return case
