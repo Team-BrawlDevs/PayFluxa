@@ -44,7 +44,7 @@ export function Copilot() {
 
       <div className="grid grid-cols-3 gap-6">
         {/* LEFT PANEL — CURRENT SCENARIO */}
-        <div className="bg-white border border-border shadow-sm p-6">
+        {/* <div className="bg-white border border-border shadow-sm p-6">
           <h3 className="mb-4">Current Scenario</h3>
           <div className="space-y-4 text-sm">
             <div>
@@ -70,11 +70,11 @@ export function Copilot() {
               <div>₹85,000</div>
             </div>
           </div>
-        </div>
+        </div> */}
 
         {/* RIGHT PANEL — AI RESPONSE */}
         <div
-          className="col-span-2 bg-white border border-border shadow-sm flex flex-col"
+          className="col-span-5 bg-white border border-border shadow-sm flex flex-col"
           style={{ height: "600px" }}
         >
           <div className="p-6 border-b border-border">
