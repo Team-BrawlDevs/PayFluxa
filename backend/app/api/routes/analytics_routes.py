@@ -46,18 +46,20 @@ def get_insights(
 def simulate_financial_scenario(
     db: Session = Depends(get_db),
     user = Depends(get_current_user),
-    monthly_income: float = Body(0),
-    monthly_expenses: float = Body(0),
-    emi: float = Body(0),
-    one_time_withdrawal: float = Body(0)
+    loan_amount: float = Body(...),
+    tenure_months: int = Body(...),
+    interest_rate: float = Body(...),
+    income_drop_percent: float = Body(0),
+    include_shock: bool = Body(False)
 ):
     return simulate_scenario(
         db=db,
         user_id=user.id,
-        monthly_income=monthly_income,
-        monthly_expenses=monthly_expenses,
-        emi=emi,
-        one_time_withdrawal=one_time_withdrawal
+        loan_amount=loan_amount,
+        tenure_months=tenure_months,
+        interest_rate=interest_rate,
+        income_drop_percent=income_drop_percent,
+        include_shock=include_shock
     )
 
 # @router.post("/monte-carlo")
