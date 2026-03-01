@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey, Numeric, TIMESTAMP
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey, Numeric, TIMESTAMP, Text
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 from app.db.database import Base
@@ -114,3 +114,43 @@ class Loan(Base):
     status = Column(String(20), default="ACTIVE")
 
     created_at = Column(DateTime, default=datetime.utcnow)
+
+class LoanRestructuringCase(Base):
+    __tablename__ = "loan_restructuring_cases"
+
+    id = Column(Integer, primary_key=True, index=True)
+    case_id = Column(String(50), unique=True, nullable=False)
+
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    loan_id = Column(Integer, ForeignKey("loans.id"), nullable=False)
+
+    # Current Snapshot
+    current_emi = Column(Numeric(12, 2), nullable=False)
+    current_tenure_months = Column(Integer, nullable=False)
+    current_risk_level = Column(String(20))
+
+    # Recommended Proposal
+    recommended_emi = Column(Numeric(12, 2))
+    recommended_tenure_months = Column(Integer)
+    recommended_risk_level = Column(String(20))
+
+    # Simulation Metrics
+    stress_probability_before = Column(Numeric(6, 2))
+    stress_probability_after = Column(Numeric(6, 2))
+
+    resilience_score_before = Column(Numeric(6, 2))
+    resilience_score_after = Column(Numeric(6, 2))
+
+    buffer_before = Column(Numeric(6, 2))
+    buffer_after = Column(Numeric(6, 2))
+
+    additional_interest_cost = Column(Numeric(12, 2))
+
+    # Workflow
+    status = Column(String(20), default="GENERATED")
+
+    admin_comments = Column(Text)
+    reviewed_by = Column(Integer, ForeignKey("users.id"))
+    reviewed_at = Column(TIMESTAMP)
+
+    generated_at = Column(TIMESTAMP, server_default=func.now())
