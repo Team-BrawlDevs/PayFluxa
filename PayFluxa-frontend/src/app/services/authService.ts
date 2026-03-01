@@ -2,6 +2,18 @@
 
 import api from "./api";
 
+export const getCurrentUserProfile = async () => {
+  const res = await api.get("/auth/me");
+  return res.data;
+};
+
+export const getMyAccount = async () => {
+  const res = await api.get("/account/my-account");
+  console.log(res.data["account_number"]);
+  
+  return res.data;
+};
+
 export const login = async (email: string, password: string) => {
   const response = await api.post("/auth/login", null, {
     params: { email, password },

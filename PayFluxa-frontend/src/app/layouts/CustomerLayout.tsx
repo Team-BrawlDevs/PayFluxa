@@ -9,8 +9,13 @@ import {
   ChevronRight,
   ArrowLeft,
 } from "lucide-react";
-import { logout } from "../services/authService";
+import {
+  getCurrentUserProfile,
+  logout,
+  getMyAccount,
+} from "../services/authService";
 import { useNavigate } from "react-router";
+import { useState, useEffect } from "react";
 
 const menuItems = [
   { path: "/customer/dashboard", icon: LayoutDashboard, label: "Dashboard" },
@@ -27,6 +32,22 @@ const menuItems = [
 
 export function CustomerLayout() {
   const navigate = useNavigate();
+  const [user, setUser] = useState<any>(null);
+  const [account, setAccount] = useState<any>(null);
+  useEffect(() => {
+    const loadUser = async () => {
+      try {
+        const data = await getCurrentUserProfile();
+        setUser(data);
+        const data1 = await getMyAccount();
+        setAccount(data1);
+      } catch (err) {
+        console.error("User load error:", err);
+      }
+    };
+
+    loadUser();
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -71,9 +92,11 @@ export function CustomerLayout() {
               AK
             </div>
             <div className="flex-1">
-              <div className="text-sm">Amit Kumar</div>
+              <div className="text-sm font-medium">
+                CIF: {account?.account_number}
+              </div>
               <div className="text-xs text-muted-foreground">
-                CIF: 234567890
+                {user?.email || "User"}
               </div>
             </div>
           </div>

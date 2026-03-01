@@ -5,6 +5,9 @@ from app.db.models import User
 from app.core.security import hash_password, verify_password, create_access_token
 from app.services.account_service import create_account_for_user
 from app.services.audit_service import create_audit_log
+from fastapi import APIRouter, Depends
+from app.core.rbac import get_current_user
+
 
 router = APIRouter()
 
@@ -72,5 +75,14 @@ def login(email: str, password: str, db: Session = Depends(get_db)):
     return {
         "access_token": token,
         "token_type": "bearer",
+        "role": user.role
+    }
+    
+    
+@router.get("/me")
+def get_me(user=Depends(get_current_user)):
+    return {
+        "id": user.id,
+        "email": user.email,
         "role": user.role
     }

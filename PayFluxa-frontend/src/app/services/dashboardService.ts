@@ -19,3 +19,8 @@ export const getAlerts = async () => {
   const res = await api.get("/analytics/insights");
   return res.data.insights;   // <-- important
 };
+
+export const getUser = async()=>{
+  const res = await api.get("/account/my-account");
+  return res.data;
+}
