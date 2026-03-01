@@ -10,6 +10,8 @@ from app.api.routes import transaction_routes
 from app.api.routes import analytics_routes
 from app.api.routes import admin_routes
 from fastapi.middleware.cors import CORSMiddleware
+from app.api.routes import admin_analytics_routes
+
 
 app = FastAPI()
 origins = [
@@ -59,3 +61,4 @@ def protected_customer(user=Depends(require_role("customer"))):
 
 app.include_router(analytics_routes.router)
 app.include_router(admin_routes.router)
+app.include_router(admin_analytics_routes.router)
