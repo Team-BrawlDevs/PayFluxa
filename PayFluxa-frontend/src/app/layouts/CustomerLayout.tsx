@@ -8,6 +8,7 @@ import {
   Bell,
   ChevronRight,
   ArrowLeft,
+  Wallet,
 } from "lucide-react";
 import {
   getCurrentUserProfile,
@@ -23,11 +24,19 @@ const menuItems = [
   { path: "/customer/financial-twin", icon: User, label: "Financial Twin" },
   { path: "/customer/simulation", icon: BarChart3, label: "Simulation" },
   { path: "/customer/copilot", icon: MessageSquare, label: "Copilot" },
+
+  {
+    path: "/customer/investment-advisor",
+    icon: Wallet,
+    label: "Investment Advisor",
+  },
+
   {
     path: "/customer/borrowing-readiness",
     icon: TrendingUp,
     label: "Borrowing Readiness",
   },
+
   { path: "/customer/alerts", icon: Bell, label: "Alerts" },
 ];
 

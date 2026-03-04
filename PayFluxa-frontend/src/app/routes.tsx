@@ -15,6 +15,7 @@ import { PolicySimulation } from "./pages/bank/PolicySimulation";
 import { AuditLogs } from "./pages/bank/AuditLogs";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { Login } from "./pages/Login";
+import InvestmentAdvisor from "./pages/customer/InvestmentAdvisor";
 
 export const router = createBrowserRouter([
   {
@@ -38,6 +39,9 @@ export const router = createBrowserRouter([
       { path: "financial-twin", element: <FinancialTwin /> },
       { path: "simulation", element: <Simulation /> },
       { path: "copilot", element: <Copilot /> },
+
+      { path: "investment-advisor", element: <InvestmentAdvisor /> },
+
       { path: "borrowing-readiness", element: <BorrowingReadiness /> },
       { path: "alerts", element: <Alerts /> },
     ],
