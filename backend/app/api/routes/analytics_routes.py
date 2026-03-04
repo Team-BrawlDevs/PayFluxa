@@ -11,6 +11,7 @@ from app.services.monte_carlo_service import monte_carlo_forecast
 from app.services.copilot_service import generate_financial_advice
 from app.services.fraud_service import detect_fraud
 from app.services.financial_twin_service import get_monthly_income_summary
+from app.services.borrowing_services import get_borrowing_readiness
 
 router = APIRouter(prefix="/analytics", tags=["Analytics"])
 
@@ -136,3 +137,10 @@ def get_borrower_profile(user_id: int, db: Session = Depends(get_db)):
         "trend": health.get("historical_trend", []),
         "stress_probability_percentage": risk.get("stress_probability_percentage", 0)
     }
+    
+@router.get("/borrowing-readiness")
+def borrowing_readiness(
+    db: Session = Depends(get_db),
+    user = Depends(get_current_user)
+):
+    return get_borrowing_readiness(db, user.id)
