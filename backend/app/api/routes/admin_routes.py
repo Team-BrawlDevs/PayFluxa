@@ -157,3 +157,11 @@ def get_restructuring_case(
         raise HTTPException(status_code=404, detail="Case not found")
 
     return case
+@router.get("/audit-logs")
+def get_audit_logs(
+    db: Session = Depends(get_db),
+    user = Depends(require_role("admin"))
+):
+    logs = db.query(AuditLog).order_by(AuditLog.timestamp.desc()).limit(100).all()
+
+    return logs
