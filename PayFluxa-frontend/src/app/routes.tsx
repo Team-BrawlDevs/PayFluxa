@@ -16,7 +16,7 @@ import { AuditLogs } from "./pages/bank/AuditLogs";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { Login } from "./pages/Login";
 import InvestmentAdvisor from "./pages/customer/InvestmentAdvisor";
-
+import { Register } from "./pages/Register";
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -25,6 +25,10 @@ export const router = createBrowserRouter([
   {
     path: "/login",
     element: <Login />,
+  },
+  {
+    path:"/register",
+    element:<Register />,
   },
   {
     path: "/customer",

@@ -1,43 +1,55 @@
 import { useState } from "react";
-import { useNavigate, useSearchParams } from "react-router";
-import { login, verifyLoginOtp } from "../services/authService";
+import { useNavigate } from "react-router";
+import api from "../services/api";
 
-export function Login() {
+export function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [otp, setOtp] = useState("");
 
   const [showOtp, setShowOtp] = useState(false);
   const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
 
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
 
-  const roleFromQuery = searchParams.get("role");
-
-  // Step 1: Login (email + password)
-  const handleLogin = async () => {
+  // Step 1: Register
+  const handleRegister = async () => {
     try {
-      await login(email, password);
+      await api.post("/auth/register", null, {
+        params: {
+          email,
+          password,
+          phone_number: phoneNumber,
+          role: "customer",
+        },
+      });
 
-      // OTP sent → show OTP input
       setShowOtp(true);
       setError("");
+      setMessage("OTP sent to your phone");
     } catch (err) {
-      setError("Invalid credentials");
+      setError("Registration failed");
     }
   };
 
   // Step 2: Verify OTP
   const handleVerifyOtp = async () => {
     try {
-      const role = await verifyLoginOtp(email, otp);
+      await api.post("/auth/verify-otp", null, {
+        params: {
+          email,
+          otp,
+        },
+      });
 
-      if (role === "customer") {
-        navigate("/customer/dashboard");
-      } else if (role === "admin") {
-        navigate("/bank/portfolio");
-      }
+      setMessage("Phone verified successfully!");
+      setError("");
+
+      setTimeout(() => {
+        navigate("/login");
+      }, 1500);
     } catch (err) {
       setError("Invalid or expired OTP");
     }
@@ -47,10 +59,9 @@ export function Login() {
     <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="bg-white p-8 shadow-md w-96 border border-border">
         <h2 className="text-2xl mb-6 text-primary text-center">
-          {roleFromQuery === "admin" ? "Bank Login" : "Customer Login"}
+          Create Customer Account
         </h2>
 
-        {/* EMAIL + PASSWORD FORM */}
         {!showOtp && (
           <>
             <input
@@ -69,27 +80,30 @@ export function Login() {
               onChange={(e) => setPassword(e.target.value)}
             />
 
+            <input
+              className="w-full mb-4 p-2 border border-border"
+              type="text"
+              placeholder="Phone Number"
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value)}
+            />
+
             {error && (
               <div className="text-red-500 text-sm mb-3">{error}</div>
             )}
+            {message && (
+              <div className="text-green-600 text-sm mb-3">{message}</div>
+            )}
 
             <button
-              onClick={handleLogin}
+              onClick={handleRegister}
               className="w-full bg-primary text-white p-2"
-            >
-              Login
-            </button>
-            <button
-              onClick={() => navigate("/register")}
-              className="w-full mt-3 border border-primary text-primary p-2"
             >
               Create Account
             </button>
           </>
-
         )}
 
-        {/* OTP FORM */}
         {showOtp && (
           <>
             <p className="text-sm text-gray-600 mb-3 text-center">
@@ -106,6 +120,9 @@ export function Login() {
 
             {error && (
               <div className="text-red-500 text-sm mb-3">{error}</div>
+            )}
+            {message && (
+              <div className="text-green-600 text-sm mb-3">{message}</div>
             )}
 
             <button
