@@ -9,6 +9,7 @@ import {
   ChevronRight,
   ArrowLeft,
   Wallet,
+  CreditCard,
 } from "lucide-react";
 import {
   getCurrentUserProfile,
@@ -21,6 +22,7 @@ import { useSessionTimer, formatTime } from "../hooks/useSessionTimer";
 
 const menuItems = [
   { path: "/customer/dashboard", icon: LayoutDashboard, label: "Dashboard" },
+  { path: "/customer/emis", icon: CreditCard, label: "Loan & EMI" },
   { path: "/customer/financial-twin", icon: User, label: "Financial Twin" },
   { path: "/customer/simulation", icon: BarChart3, label: "Simulation" },
   { path: "/customer/copilot", icon: MessageSquare, label: "Copilot" },

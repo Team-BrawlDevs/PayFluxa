@@ -12,7 +12,7 @@ from app.api.routes import admin_routes
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.routes import admin_analytics_routes
 from app.api.routes import investment_routes
-
+from app.api.routes import customer_routes
 
 
 app = FastAPI()
@@ -65,4 +65,4 @@ app.include_router(analytics_routes.router)
 app.include_router(admin_routes.router)
 app.include_router(admin_analytics_routes.router)
 app.include_router(investment_routes.router)
-
+app.include_router(customer_routes.router)

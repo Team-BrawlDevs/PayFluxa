@@ -17,6 +17,7 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 import { Login } from "./pages/Login";
 import InvestmentAdvisor from "./pages/customer/InvestmentAdvisor";
 import { Register } from "./pages/Register";
+import { EmiDetails } from "./pages/customer/EmiDetails";
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -40,6 +41,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <Navigate to="/customer/dashboard" replace /> },
       { path: "dashboard", element: <CustomerDashboard /> },
+      {path: "emis",  element:<EmiDetails />},
       { path: "financial-twin", element: <FinancialTwin /> },
       { path: "simulation", element: <Simulation /> },
       { path: "copilot", element: <Copilot /> },
