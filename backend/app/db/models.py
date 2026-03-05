@@ -8,10 +8,25 @@ class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
+
     email = Column(String, unique=True, index=True, nullable=False)
+
+    phone_number = Column(String(15), unique=True, nullable=True)
+
     hashed_password = Column(String, nullable=False)
+
     role = Column(String, nullable=False)  # customer | credit_officer | risk_admin
+
     is_active = Column(Boolean, default=True)
+
+    phone_verified = Column(Boolean, default=False)
+
+    failed_login_attempts = Column(Integer, default=0)
+
+    account_locked_until = Column(DateTime(timezone=True), nullable=True)
+
+    password_changed_at = Column(DateTime(timezone=True), server_default=func.now())
+
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
 class Account(Base):
@@ -154,3 +169,20 @@ class LoanRestructuringCase(Base):
     reviewed_at = Column(TIMESTAMP)
 
     generated_at = Column(TIMESTAMP, server_default=func.now())
+
+class OTPCode(Base):
+    __tablename__ = "otp_codes"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+
+    otp_hash = Column(String, nullable=False)
+
+    expires_at = Column(DateTime(timezone=True), nullable=False)
+
+    is_used = Column(Boolean, default=False)
+
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    user = relationship("User")

@@ -7,3 +7,5 @@ bcrypt
 PyJWT
 cryptography
 pydantic
+sqlalchemy-utils
+requests
