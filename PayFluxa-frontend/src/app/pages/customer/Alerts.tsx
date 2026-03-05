@@ -141,7 +141,7 @@ export function Alerts() {
                           Dismiss
                         </button>
 
-                        <button
+                        {/* <button
                           onClick={async () => {
                             await markAlertRead(alert.id);
 
@@ -154,7 +154,7 @@ export function Alerts() {
                           className="text-xs px-3 py-1 bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
                         >
                           Mark Read
-                        </button>
+                        </button> */}
                       </div>
                     </div>
                   </div>
