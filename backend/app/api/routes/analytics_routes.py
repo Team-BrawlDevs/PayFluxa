@@ -12,6 +12,8 @@ from app.services.copilot_service import generate_financial_advice
 from app.services.fraud_service import detect_fraud
 from app.services.financial_twin_service import get_monthly_income_summary
 from app.services.borrowing_services import get_borrowing_readiness
+from app.services.alerts_service import generate_alerts
+from app.db.models import FinancialAlert
 
 router = APIRouter(prefix="/analytics", tags=["Analytics"])
 
@@ -144,3 +146,56 @@ def borrowing_readiness(
     user = Depends(get_current_user)
 ):
     return get_borrowing_readiness(db, user.id)
+
+@router.get("/alerts")
+def get_alerts(
+    db: Session = Depends(get_db),
+    user = Depends(get_current_user)
+):
+    generate_alerts(db, user.id)
+
+    alerts = db.query(FinancialAlert).filter(
+        FinancialAlert.user_id == user.id
+    ).order_by(FinancialAlert.created_at.desc()).all()
+
+    return alerts
+
+@router.patch("/alerts/{alert_id}/read")
+def mark_read(
+    alert_id: int,
+    db: Session = Depends(get_db),
+    user = Depends(get_current_user)
+):
+
+    alert = db.query(FinancialAlert).filter(
+        FinancialAlert.id == alert_id,
+        FinancialAlert.user_id == user.id
+    ).first()
+
+    if not alert:
+        raise HTTPException(status_code=404, detail="Alert not found")
+
+    alert.is_read = True
+    db.commit()
+
+    return {"message": "Alert marked as read"}
+
+@router.delete("/alerts/{alert_id}")
+def delete_alert(
+    alert_id: int,
+    db: Session = Depends(get_db),
+    user = Depends(get_current_user)
+):
+
+    alert = db.query(FinancialAlert).filter(
+        FinancialAlert.id == alert_id,
+        FinancialAlert.user_id == user.id
+    ).first()
+
+    if not alert:
+        raise HTTPException(status_code=404, detail="Alert not found")
+
+    db.delete(alert)
+    db.commit()
+
+    return {"message": "Alert dismissed"}

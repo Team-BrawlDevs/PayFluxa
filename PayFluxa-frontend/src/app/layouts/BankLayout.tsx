@@ -21,11 +21,11 @@ const menuItems = [
   },
   { path: "/bank/borrower-risk", icon: AlertTriangle, label: "Borrower Risk" },
   { path: "/bank/restructuring", icon: FileText, label: "Restructuring Cases" },
-  // {
-  //   path: "/bank/policy-simulation",
-  //   icon: Settings,
-  //   label: "Policy Simulation",
-  // },
+  {
+    path: "/bank/policy-simulation",
+    icon: Settings,
+    label: "Policy Simulation",
+  },
   { path: "/bank/audit-logs", icon: Shield, label: "Audit Logs" },
 ];
 

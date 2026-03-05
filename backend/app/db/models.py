@@ -186,3 +186,18 @@ class OTPCode(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     user = relationship("User")
+    
+class FinancialAlert(Base):
+    __tablename__ = "financial_alerts"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+
+    severity = Column(String)
+    title = Column(Text)
+    description = Column(Text)
+    category = Column(String)
+
+    is_read = Column(Boolean, default=False)
+
+    created_at = Column(DateTime, default=datetime.utcnow)
