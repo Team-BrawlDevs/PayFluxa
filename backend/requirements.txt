@@ -9,3 +9,4 @@ cryptography
 pydantic
 sqlalchemy-utils
 requests
+python-multipart
