@@ -18,6 +18,7 @@ import { Login } from "./pages/Login";
 import InvestmentAdvisor from "./pages/customer/InvestmentAdvisor";
 import { Register } from "./pages/Register";
 import { EmiDetails } from "./pages/customer/EmiDetails";
+import { LoanBook } from "./pages/bank/LoanBook";
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -63,6 +64,7 @@ export const router = createBrowserRouter([
       { index: true, element: <Navigate to="/bank/portfolio" replace /> },
       { path: "portfolio", element: <PortfolioDashboard /> },
       { path: "borrower-risk", element: <BorrowerRisk /> },
+      { path: "loan-book", element: <LoanBook /> },
       { path: "restructuring", element: <Restructuring /> },
       { path: "policy-simulation", element: <PolicySimulation /> },
       { path: "audit-logs", element: <AuditLogs /> },

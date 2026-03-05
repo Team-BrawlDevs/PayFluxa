@@ -165,3 +165,12 @@ def get_audit_logs(
     logs = db.query(AuditLog).order_by(AuditLog.timestamp.desc()).limit(100).all()
 
     return logs
+@router.get("/loan-book")
+def get_all_loans(
+    db: Session = Depends(get_db),
+    user = Depends(require_role("admin"))
+):
+
+    loans = db.query(Loan).all()
+
+    return loans
