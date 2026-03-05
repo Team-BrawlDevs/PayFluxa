@@ -199,3 +199,16 @@ def delete_alert(
     db.commit()
 
     return {"message": "Alert dismissed"}
+
+@router.get("/alerts/unread-count")
+def get_unread_alert_count(
+    db: Session = Depends(get_db),
+    user = Depends(get_current_user)
+):
+
+    count = db.query(FinancialAlert).filter(
+        FinancialAlert.user_id == user.id,
+        FinancialAlert.is_read == False
+    ).count()
+
+    return {"count": count}

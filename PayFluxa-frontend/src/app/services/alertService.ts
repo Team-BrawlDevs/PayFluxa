@@ -29,3 +29,16 @@ export const markAlertRead = async (id: number) => {
     headers: { Authorization: `Bearer ${token}` }
   });
 };
+
+export const getUnreadAlertCount = async () => {
+  const token = localStorage.getItem("access_token");
+
+  const res = await axios.get(
+    "http://127.0.0.1:8000/analytics/alerts/unread-count",
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+
+  return res.data.count;
+};

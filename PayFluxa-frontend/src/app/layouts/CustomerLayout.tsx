@@ -19,7 +19,7 @@ import {
 import { useNavigate } from "react-router";
 import { useState, useEffect } from "react";
 import { useSessionTimer, formatTime } from "../hooks/useSessionTimer";
-
+import { getUnreadAlertCount } from "../services/alertService";
 const menuItems = [
   { path: "/customer/dashboard", icon: LayoutDashboard, label: "Dashboard" },
   { path: "/customer/emis", icon: CreditCard, label: "Loan & EMI" },
@@ -47,6 +47,16 @@ export function CustomerLayout() {
   const [user, setUser] = useState<any>(null);
   const [account, setAccount] = useState<any>(null);
   const timeLeft = useSessionTimer();
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    const load = async () => {
+      const c = await getUnreadAlertCount();
+      setCount(c);
+    };
+
+    load();
+  }, []);
   useEffect(() => {
     const loadUser = async () => {
       try {
@@ -131,12 +141,16 @@ export function CustomerLayout() {
             <div className="text-xs text-muted-foreground mt-2">
               Session expires in: {formatTime(timeLeft)}
             </div>
+
             <button
               className="relative p-2 hover:bg-secondary rounded"
               onClick={() => navigate("/customer/alerts")}
             >
               <Bell size={20} />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-[#DC2626] rounded-full"></span>
+
+              {count > 0 && (
+                <span className="absolute top-1 right-1 w-2 h-2 bg-[#DC2626] rounded-full"></span>
+              )}
             </button>
             <button onClick={handleLogout} className="text-sm text-red-500">
               Logout

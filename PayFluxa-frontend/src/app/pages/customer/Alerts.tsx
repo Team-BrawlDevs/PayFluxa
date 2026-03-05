@@ -4,6 +4,7 @@ import {
   getAlerts,
   dismissAlert,
   markAlertRead,
+  getUnreadAlertCount,
 } from "../../services/alertService";
 
 type Severity = "high" | "medium" | "low";
@@ -20,7 +21,16 @@ interface Alert {
 
 export function Alerts() {
   const [alerts, setAlerts] = useState<Alert[]>([]);
+  const [count, setCount] = useState(0);
 
+  useEffect(() => {
+    const load = async () => {
+      const c = await getUnreadAlertCount();
+      setCount(c);
+    };
+
+    load();
+  }, []);
   useEffect(() => {
     const loadAlerts = async () => {
       const data = await getAlerts();
@@ -68,12 +78,20 @@ export function Alerts() {
           </p>
         </div>
 
-        <button className="px-4 py-2 text-sm border border-border hover:bg-secondary transition-colors">
+        {/* <button className="px-4 py-2 text-sm border border-border hover:bg-secondary transition-colors">
           Mark All as Read
-        </button>
+        </button> */}
       </div>
 
       <div className="space-y-4">
+        {alerts.length === 0 && (
+          <div className="bg-white border border-border shadow-sm p-10 text-center">
+            <div className="text-muted-foreground text-sm">
+              🎉 No alerts right now. Your financial health looks good.
+            </div>
+          </div>
+        )}
+
         {alerts.map((alert) => {
           const Icon = getIcon(alert.severity);
           const styles = severityStyles[alert.severity];
