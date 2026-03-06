@@ -7,7 +7,8 @@ import {
   Shield,
   Bell,
   ChevronRight,
-  ArrowLeft, Wallet
+  ArrowLeft,
+  Wallet,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getCurrentUserProfile, logout } from "../services/authService";
@@ -23,15 +24,15 @@ const menuItems = [
   {
     path: "/bank/loan-book",
     icon: Wallet,
-    label: "Loan Book"
+    label: "Loan Book",
   },
   { path: "/bank/restructuring", icon: FileText, label: "Restructuring Cases" },
-  
-  {
-    path: "/bank/policy-simulation",
-    icon: Settings,
-    label: "Policy Simulation",
-  },
+
+  // {
+  //   path: "/bank/policy-simulation",
+  //   icon: Settings,
+  //   label: "Policy Simulation",
+  // },
   { path: "/bank/audit-logs", icon: Shield, label: "Audit Logs" },
 ];
 
@@ -82,9 +83,10 @@ export function BankLayout() {
               key={item.path}
               to={item.path}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-4 py-3 mb-1 transition-colors ${isActive
-                  ? "bg-[#EFF6FF] text-primary"
-                  : "text-muted-foreground hover:bg-secondary"
+                `flex items-center gap-3 px-4 py-3 mb-1 transition-colors ${
+                  isActive
+                    ? "bg-[#EFF6FF] text-primary"
+                    : "text-muted-foreground hover:bg-secondary"
                 }`
               }
             >
