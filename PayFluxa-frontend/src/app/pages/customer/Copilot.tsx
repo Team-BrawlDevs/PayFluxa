@@ -65,7 +65,6 @@ export function Copilot() {
 
   return (
     <div className="flex flex-col h-[700px] bg-white border border-border shadow-sm">
-
       {/* HEADER */}
 
       <div className="p-6 border-b border-border">
@@ -75,20 +74,18 @@ export function Copilot() {
         </p>
       </div>
 
-
       {/* CHAT AREA */}
 
       <div className="flex-1 overflow-auto p-6 space-y-6">
-
         {messages.length === 0 && (
           <div className="text-sm text-muted-foreground">
-            Ask questions about loans, investments, spending habits, or financial planning.
+            Ask questions about loans, investments, spending habits, or
+            financial planning.
           </div>
         )}
 
         {messages.map((m, i) => (
           <div key={i} className="space-y-3">
-
             {/* USER MESSAGE */}
 
             {m.role === "user" && (
@@ -102,117 +99,107 @@ export function Copilot() {
             {/* AI MESSAGE */}
 
             {m.role === "assistant" && (
-              <div className="space-y-4 max-w-xl">
-
-                {/* AI CHAT BUBBLE */}
-
-                <div className="bg-secondary px-4 py-3 text-sm">
+              <div className="space-y-5">
+                {/* AI SHORT MESSAGE */}
+                <div className="bg-secondary px-4 py-3 text-sm rounded">
                   {m.text}
                 </div>
 
-
-                {/* ANALYSIS */}
-
-                {m.data?.analysis && (
-                  <div className="border border-border p-4">
-                    <div className="text-xs text-muted-foreground mb-2">
-                      Financial Analysis
-                    </div>
-                    <div className="text-sm whitespace-pre-line">
-                      {m.data.analysis}
-                    </div>
-                  </div>
-                )}
-
-
-                {/* RISK SUMMARY */}
-
+                {/* RISK SUMMARY CARDS */}
                 {m.data?.risk_summary && (
-                  <div className="border border-border p-4">
-
-                    <div className="text-xs text-muted-foreground mb-3">
-                      Risk Impact Summary
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="border border-border p-4 rounded text-center">
+                      <div className="text-xs text-muted-foreground mb-1">
+                        Health Score
+                      </div>
+                      <div className="text-2xl font-semibold">
+                        {m.data.risk_summary.health_score}
+                      </div>
                     </div>
 
-                    <div className="space-y-2 text-sm">
-
-                      <div className="flex justify-between">
-                        <span>Health Score</span>
-                        <span>{m.data.risk_summary.health_score}</span>
+                    <div className="border border-border p-4 rounded text-center">
+                      <div className="text-xs text-muted-foreground mb-1">
+                        Risk Level
                       </div>
-
-                      <div className="flex justify-between">
-                        <span>Risk Level</span>
-                        <span
-                          className={
-                            m.data.risk_summary.risk_level === "HIGH"
-                              ? "text-red-500"
-                              : m.data.risk_summary.risk_level === "MEDIUM"
+                      <div
+                        className={`text-xl font-semibold ${
+                          m.data.risk_summary.risk_level === "HIGH"
+                            ? "text-red-500"
+                            : m.data.risk_summary.risk_level === "MEDIUM"
                               ? "text-yellow-500"
                               : "text-green-600"
-                          }
-                        >
-                          {m.data.risk_summary.risk_level}
-                        </span>
+                        }`}
+                      >
+                        {m.data.risk_summary.risk_level}
                       </div>
+                    </div>
 
-                      <div className="flex justify-between">
-                        <span>Survival Probability</span>
-                        <span>
-                          {(m.data.risk_summary.survival_probability * 100).toFixed(1)}%
-                        </span>
+                    <div className="border border-border p-4 rounded text-center">
+                      <div className="text-xs text-muted-foreground mb-1">
+                        Survival Probability
                       </div>
-
+                      <div className="text-2xl font-semibold">
+                        {(
+                          m.data.risk_summary.survival_probability * 100
+                        ).toFixed(0)}
+                        %
+                      </div>
                     </div>
                   </div>
                 )}
 
+                {/* FINANCIAL HEALTH BAR */}
+                {m.data?.risk_summary && (
+                  <div className="border border-border p-4 rounded">
+                    <div className="text-xs text-muted-foreground mb-2">
+                      Financial Health
+                    </div>
+
+                    <div className="w-full bg-gray-200 h-2 rounded">
+                      <div
+                        className="bg-green-500 h-2 rounded"
+                        style={{
+                          width: `${m.data.risk_summary.health_score}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
 
                 {/* RECOMMENDATIONS */}
-
                 {m.data?.recommendations?.length ? (
-                  <div className="bg-[#EFF6FF] border border-[#1E3A8A] p-4">
-
-                    <div className="text-xs text-primary mb-3">
+                  <div className="grid gap-3">
+                    <div className="text-xs text-primary">
                       Recommended Actions
                     </div>
 
-                    <div className="space-y-2 text-sm">
-
-                      {m.data.recommendations.map((rec, index) => (
-                        <div key={index} className="flex gap-2">
-                          <span className="text-primary">{index + 1}.</span>
-                          <span>{rec}</span>
-                        </div>
-                      ))}
-
-                    </div>
-
+                    {m.data.recommendations.map((rec, index) => (
+                      <div
+                        key={index}
+                        className="border border-blue-200 bg-blue-50 p-3 rounded text-sm"
+                      >
+                        💡 {rec}
+                      </div>
+                    ))}
                   </div>
                 ) : null}
-
 
                 {/* WARNINGS */}
-
                 {m.data?.warnings?.length ? (
-                  <div className="bg-red-50 border border-red-300 p-4 text-sm text-red-600">
+                  <div className="border border-red-300 bg-red-50 p-4 rounded">
+                    <div className="text-red-600 font-semibold mb-2">
+                      ⚠ Financial Risks
+                    </div>
 
-                    <strong>Warnings</strong>
-
-                    <ul className="list-disc ml-5 mt-2">
-
+                    <ul className="space-y-1 text-sm text-red-600">
                       {m.data.warnings.map((w, i) => (
-                        <li key={i}>{w}</li>
+                        <li key={i}>• {w}</li>
                       ))}
-
                     </ul>
-
                   </div>
                 ) : null}
-
               </div>
             )}
-
           </div>
         ))}
 
@@ -221,16 +208,12 @@ export function Copilot() {
             Financial Copilot is analysing your financial data...
           </div>
         )}
-
       </div>
-
 
       {/* INPUT */}
 
       <div className="p-4 border-t border-border">
-
         <div className="flex gap-2">
-
           <input
             type="text"
             value={question}
@@ -246,11 +229,8 @@ export function Copilot() {
             <Send size={16} />
             Send
           </button>
-
         </div>
-
       </div>
-
     </div>
   );
 }
