@@ -2,7 +2,7 @@
   <img width="242" height="76" alt="image" src="https://github.com/user-attachments/assets/51144ee2-a73d-40b4-ac2c-254e1e7c6702" />
 </p>
 
-# PayFluxa – AI Financial Health & Risk Intelligence Platform
+# AI Financial Health & Risk Intelligence Platform
 
 PayFluxa is a **bank-grade financial analytics and risk intelligence platform** that analyzes financial behavior and provides **financial health insights, borrowing readiness evaluation, fraud detection, and loan restructuring recommendations**.
 
