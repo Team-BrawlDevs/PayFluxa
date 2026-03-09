@@ -5,7 +5,7 @@ import { Welcome } from "./pages/Welcome";
 import { CustomerDashboard } from "./pages/customer/Dashboard";
 import { FinancialTwin } from "./pages/customer/FinancialTwin";
 import { Simulation } from "./pages/customer/Simulation";
-import { Copilot } from "./pages/customer/Copilot";
+import Copilot from "./pages/customer/Copilot";
 import { BorrowingReadiness } from "./pages/customer/BorrowingReadiness";
 import { Alerts } from "./pages/customer/Alerts";
 import { PortfolioDashboard } from "./pages/bank/PortfolioDashboard";

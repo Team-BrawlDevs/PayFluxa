@@ -1,236 +1,147 @@
-import { useState } from "react";
-import { Send } from "lucide-react";
-import { askCopilot } from "../../services/copilotService";
+import React, { useState, useRef, useEffect } from 'react';
+import { sendCopilotMessage, ChatMessage, CopilotResponse } from '../../services/copilotService';
+import { Send, AlertTriangle, Lightbulb, Activity } from 'lucide-react'; 
 
-interface CopilotResponse {
-  message: string;
-  analysis?: string;
-  risk_summary?: {
-    health_score: number;
-    risk_level: string;
-    survival_probability: number;
-  };
-  warnings?: string[];
-  recommendations?: string[];
-}
+export default function Copilot() {
+    const [messages, setMessages] = useState<ChatMessage[]>([{
+        role: 'assistant',
+        content: "Hello! I'm your PayFluxa Copilot. Ask me anything about your loans, cashflow health, or future investment strategies."
+    }]);
+    const [input, setInput] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const [latestData, setLatestData] = useState<CopilotResponse | null>(null);
+    const messagesEndRef = useRef<HTMLDivElement>(null);
 
-interface ChatMessage {
-  role: "user" | "assistant";
-  text: string;
-  data?: CopilotResponse;
-}
-
-export function Copilot() {
-  const [question, setQuestion] = useState("");
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [loading, setLoading] = useState(false);
-
-  const handleSend = async () => {
-    if (!question.trim()) return;
-
-    const userMsg: ChatMessage = {
-      role: "user",
-      text: question,
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
 
-    const updatedMessages = [...messages, userMsg];
+    useEffect(() => {
+        scrollToBottom();
+    }, [messages]);
 
-    setMessages(updatedMessages);
-    setQuestion("");
-    setLoading(true);
+    const handleSend = async () => {
+        if (!input.trim()) return;
+        
+        const userText = input;
+        const currentHistory = [...messages]; 
+        
+        setMessages(prev => [...prev, { role: 'user', content: userText }]);
+        setInput('');
+        setIsLoading(true);
 
-    try {
-      const history = updatedMessages
-        .filter((m) => m.role === "assistant")
-        .map((m, i) => ({
-          question: updatedMessages[i * 2]?.text,
-          answer: m.text,
-        }));
+        try {
+            const response = await sendCopilotMessage(userText, currentHistory);
+            
+            setMessages(prev => [...prev, { role: 'assistant', content: response.message }]);
+            setLatestData(response);
+        } catch (error) {
+            setMessages(prev => [...prev, { role: 'assistant', content: "I'm having trouble connecting right now. Please try again." }]);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
-      const res: CopilotResponse = await askCopilot(question, history);
-
-      const aiMsg: ChatMessage = {
-        role: "assistant",
-        text: res.message,
-        data: res,
-      };
-
-      setMessages([...updatedMessages, aiMsg]);
-    } catch (err) {
-      console.error("Copilot error:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div className="flex flex-col h-[700px] bg-white border border-border shadow-sm">
-      {/* HEADER */}
-
-      <div className="p-6 border-b border-border">
-        <h2 className="text-xl mb-1">Financial Copilot</h2>
-        <p className="text-sm text-muted-foreground">
-          AI-powered financial and investment advisor
-        </p>
-      </div>
-
-      {/* CHAT AREA */}
-
-      <div className="flex-1 overflow-auto p-6 space-y-6">
-        {messages.length === 0 && (
-          <div className="text-sm text-muted-foreground">
-            Ask questions about loans, investments, spending habits, or
-            financial planning.
-          </div>
-        )}
-
-        {messages.map((m, i) => (
-          <div key={i} className="space-y-3">
-            {/* USER MESSAGE */}
-
-            {m.role === "user" && (
-              <div className="flex justify-end">
-                <div className="bg-primary text-white px-4 py-2 max-w-xl">
-                  {m.text}
+    return (
+        <div className="flex h-[calc(100vh-100px)] gap-6 p-6 bg-gray-50">
+            {/* Left Chat Interface */}
+            <div className="flex-1 flex flex-col bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div className="p-4 border-b border-gray-100 bg-white font-semibold text-gray-800 flex items-center gap-2">
+                    <Activity size={20} className="text-blue-600"/> Copilot Chat
                 </div>
-              </div>
-            )}
-
-            {/* AI MESSAGE */}
-
-            {m.role === "assistant" && (
-              <div className="space-y-5">
-                {/* AI SHORT MESSAGE */}
-                <div className="bg-secondary px-4 py-3 text-sm rounded">
-                  {m.text}
-                </div>
-
-                {/* RISK SUMMARY CARDS */}
-                {m.data?.risk_summary && (
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="border border-border p-4 rounded text-center">
-                      <div className="text-xs text-muted-foreground mb-1">
-                        Health Score
-                      </div>
-                      <div className="text-2xl font-semibold">
-                        {m.data.risk_summary.health_score}
-                      </div>
-                    </div>
-
-                    <div className="border border-border p-4 rounded text-center">
-                      <div className="text-xs text-muted-foreground mb-1">
-                        Risk Level
-                      </div>
-                      <div
-                        className={`text-xl font-semibold ${
-                          m.data.risk_summary.risk_level === "HIGH"
-                            ? "text-red-500"
-                            : m.data.risk_summary.risk_level === "MEDIUM"
-                              ? "text-yellow-500"
-                              : "text-green-600"
-                        }`}
-                      >
-                        {m.data.risk_summary.risk_level}
-                      </div>
-                    </div>
-
-                    <div className="border border-border p-4 rounded text-center">
-                      <div className="text-xs text-muted-foreground mb-1">
-                        Survival Probability
-                      </div>
-                      <div className="text-2xl font-semibold">
-                        {(
-                          m.data.risk_summary.survival_probability * 100
-                        ).toFixed(0)}
-                        %
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* FINANCIAL HEALTH BAR */}
-                {m.data?.risk_summary && (
-                  <div className="border border-border p-4 rounded">
-                    <div className="text-xs text-muted-foreground mb-2">
-                      Financial Health
-                    </div>
-
-                    <div className="w-full bg-gray-200 h-2 rounded">
-                      <div
-                        className="bg-green-500 h-2 rounded"
-                        style={{
-                          width: `${m.data.risk_summary.health_score}%`,
-                        }}
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {/* RECOMMENDATIONS */}
-                {m.data?.recommendations?.length ? (
-                  <div className="grid gap-3">
-                    <div className="text-xs text-primary">
-                      Recommended Actions
-                    </div>
-
-                    {m.data.recommendations.map((rec, index) => (
-                      <div
-                        key={index}
-                        className="border border-blue-200 bg-blue-50 p-3 rounded text-sm"
-                      >
-                        💡 {rec}
-                      </div>
+                
+                <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50/50">
+                    {messages.map((msg, idx) => (
+                        <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                            <div className={`max-w-[75%] p-4 rounded-xl text-sm leading-relaxed shadow-sm ${
+                                msg.role === 'user' 
+                                    ? 'bg-blue-600 text-white rounded-br-sm' 
+                                    : 'bg-white border border-gray-100 text-gray-800 rounded-bl-sm'
+                            }`}>
+                                <div className="whitespace-pre-wrap">{msg.content}</div>
+                            </div>
+                        </div>
                     ))}
-                  </div>
-                ) : null}
+                    {isLoading && (
+                        <div className="flex justify-start">
+                            <div className="bg-white border border-gray-100 p-4 rounded-xl rounded-bl-sm text-gray-400 text-sm animate-pulse shadow-sm">
+                                Analyzing financial data...
+                            </div>
+                        </div>
+                    )}
+                    <div ref={messagesEndRef} />
+                </div>
 
-                {/* WARNINGS */}
-                {m.data?.warnings?.length ? (
-                  <div className="border border-red-300 bg-red-50 p-4 rounded">
-                    <div className="text-red-600 font-semibold mb-2">
-                      ⚠ Financial Risks
+                <div className="p-4 bg-white border-t border-gray-100 flex gap-3 items-center">
+                    <input 
+                        type="text" 
+                        className="flex-1 bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
+                        placeholder="Ask about a loan restructuring or investment idea..."
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+                    />
+                    <button 
+                        onClick={handleSend}
+                        disabled={isLoading}
+                        className="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-lg flex items-center justify-center transition-colors disabled:opacity-50"
+                    >
+                        <Send size={18} />
+                    </button>
+                </div>
+            </div>
+
+            {/* Right Dashboard Panel */}
+            <div className="w-[350px] flex flex-col gap-4 overflow-y-auto">
+                {latestData?.metrics && (
+                    <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
+                        <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Live Twin Metrics</h3>
+                        <div className="space-y-4">
+                            <div className="flex justify-between items-center">
+                                <span className="text-sm text-gray-600 font-medium">Health Score</span>
+                                <span className="font-bold text-lg text-blue-600">{latestData.metrics.health_score}</span>
+                            </div>
+                            <div className="w-full bg-gray-100 rounded-full h-2">
+                                <div className="bg-blue-600 h-2 rounded-full" style={{ width: `${latestData.metrics.health_score}%` }}></div>
+                            </div>
+
+                            <div className="flex justify-between items-center mt-2">
+                                <span className="text-sm text-gray-600 font-medium">12m Survival Prob.</span>
+                                <span className="font-bold text-lg text-emerald-600">{(latestData.metrics.survival_probability * 100).toFixed(1)}%</span>
+                            </div>
+                        </div>
                     </div>
+                )}
 
-                    <ul className="space-y-1 text-sm text-red-600">
-                      {m.data.warnings.map((w, i) => (
-                        <li key={i}>• {w}</li>
-                      ))}
-                    </ul>
-                  </div>
-                ) : null}
-              </div>
-            )}
-          </div>
-        ))}
+                {latestData?.warnings && latestData.warnings.length > 0 && (
+                    <div className="bg-red-50 p-5 rounded-xl border border-red-100">
+                        <h3 className="font-semibold text-red-800 flex items-center gap-2 mb-3 text-sm">
+                            <AlertTriangle size={16} /> Risk Alerts
+                        </h3>
+                        <ul className="space-y-2">
+                            {latestData.warnings.map((w, i) => (
+                                <li key={i} className="text-sm text-red-700 leading-relaxed border-l-2 border-red-300 pl-3">{w}</li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
 
-        {loading && (
-          <div className="text-sm text-muted-foreground">
-            Financial Copilot is analysing your financial data...
-          </div>
-        )}
-      </div>
-
-      {/* INPUT */}
-
-      <div className="p-4 border-t border-border">
-        <div className="flex gap-2">
-          <input
-            type="text"
-            value={question}
-            onChange={(e) => setQuestion(e.target.value)}
-            placeholder="Ask about loans, investments, spending..."
-            className="flex-1 px-4 py-2 border border-border bg-input-background"
-          />
-
-          <button
-            onClick={handleSend}
-            className="px-6 py-2 bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2"
-          >
-            <Send size={16} />
-            Send
-          </button>
+                {latestData?.recommendations && latestData.recommendations.length > 0 && (
+                    <div className="bg-blue-50 p-5 rounded-xl border border-blue-100">
+                        <h3 className="font-semibold text-blue-800 flex items-center gap-2 mb-3 text-sm">
+                            <Lightbulb size={16} /> Strategic Actions
+                        </h3>
+                        <ul className="space-y-3">
+                            {latestData.recommendations.map((r, i) => (
+                                <li key={i} className="text-sm text-blue-800 leading-relaxed flex gap-2">
+                                    <span className="text-blue-400 mt-0.5">•</span>
+                                    <span>{r}</span>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
+            </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 }
